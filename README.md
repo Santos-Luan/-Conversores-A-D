@@ -74,3 +74,6 @@ Através da função `gpio_set_irq_enabled_with_callback`, as interrupções sã
 4. **Testes**:
    - Verifique as leituras do joystick no display OLED.
    - Acione os botões e observe a mudança nos LEDs e no comportamento do sistema.
+5. **Video demonstrativo**
+   [aqui](https://drive.google.com/file/d/12nUF8ELgTxMxErDgek3VtyauEhodpr9q/view?usp=drivesdk)
+
