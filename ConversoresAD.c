@@ -28,6 +28,7 @@ const float DIVISOR_PWM = 16.0;
 bool leds_ativos = true;
 bool estado_led_verde = false;
 bool cor = true;
+int estilo_borda = 0;
 
 void tratar_interrupcao_gpio(uint gpio, uint32_t eventos);        // Função para tratar interrupções nos botões
 void configurar_pwm(uint gpio);                                   // Configuração do PWM
@@ -35,11 +36,13 @@ void atualizar_display(uint16_t x, uint16_t y);                   // Atualiza a 
 void debounce(uint gpio, absolute_time_t *ultimo_pressionamento); // Implementação do debounce
 uint16_t calcular_pwm(uint16_t valor);                            // Calcula o nível PWM com base na posição do joystick
 void desenhar();
+void desenhar_bord();
 
 absolute_time_t ultimo_pressionamento_joystick, ultimo_pressionamento_botaoA;
 
 void tratar_interrupcao_gpio(uint gpio, uint32_t eventos)
 {
+    bool op = true;
     absolute_time_t agora = get_absolute_time();
     if (gpio == BOTAO_JOYSTICK)
     {
@@ -48,6 +51,14 @@ void tratar_interrupcao_gpio(uint gpio, uint32_t eventos)
             ultimo_pressionamento_joystick = agora;
             estado_led_verde = !estado_led_verde;
             pwm_set_gpio_level(LED_VERDE, estado_led_verde ? PERIODO_PWM : 0);
+        }
+        if (estilo_borda < 3)
+        {
+            estilo_borda++;
+        }
+        else
+        {
+            estilo_borda = 0;
         }
     }
     if (gpio == BOTAO_A)
@@ -168,10 +179,6 @@ void atualizar_display(uint16_t x, uint16_t y)
 // Desenha no display oled
 void desenhar()
 {
-
-    ssd1306_fill(&display, false);
-    ssd1306_fill(&display, !cor);
-    ssd1306_rect(&display, 3, 3, 122, 60, cor, !cor); // Desenha um retângulo
     //====CASINHA====>
     // TELHADO
     ssd1306_line(&display, 3, 30, 123, 30, cor);
@@ -187,5 +194,24 @@ void desenhar()
     ssd1306_line(&display, 87, 56, 93, 56, cor);
     ssd1306_line(&display, 93, 56, 93, 48, cor);
     ssd1306_line(&display, 87, 56, 87, 48, cor);
-    
+}
+// Estilo de borda
+void desenhar_borda()
+{
+    switch (estilo_borda)
+    {
+    case 0:
+        ssd1306_rect(&display, 3, 3, 122, 60, cor, !cor); // Desenha um retângulo
+        break;
+    case 1:
+        ssd1306_line(&display, 2, 2, 124, 2, true);
+        ssd1306_line(&display, 2, 62, 124, 62, true);
+        ssd1306_line(&display, 2, 2, 2, 62, true);
+        ssd1306_line(&display, 124, 2, 124, 62, true);
+        break;
+    case 2:
+        ssd1306_line(&display, 2, 2, 124, 62, true);
+        ssd1306_line(&display, 124, 2, 2, 62, true);
+        break;
+    }
 }
